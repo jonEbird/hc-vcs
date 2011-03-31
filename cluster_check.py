@@ -74,7 +74,7 @@ std_cluser_attr = {
 def health_check(system=''):
      """ Perform a health check on the cluster.
      """
-     print '%s\nChecking system: %s' % ('-' * 50, system)
+     print 'Checking system: %s' % (system)
      c = hcvcs.VCS(server=system)
      if not c.status:
           print '  Error: Problem communicating with cluster. Moving on.'
@@ -143,6 +143,5 @@ def health_check(system=''):
 
 if __name__ == '__main__':
      
-     systems = "alpha bravo charlie delta easy frank hotel india juliet king lance november".split()
-     for system in systems:
-          health_check(system)
+     print 'Performing a health check on the local cluster.'
+     health_check()
