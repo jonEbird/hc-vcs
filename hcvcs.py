@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import subprocess, re, sys
+import subprocess, re, sys, os
 
 try:
     import paramiko
 except ImportError:
-    raise Exception, "Please install the paramiko module. Required for connecting to remote servers."
+    pass #raise Exception, "Please install the paramiko module. Required for connecting to remote servers."
 
 def quad2dict(l, pyfriendly=False):
      """ Takes a list of quadruple values and creates a dictionary out of the key(2nd) to value(4th) items.
@@ -40,7 +40,7 @@ class VCS:
     def __init__(self, server='local', username='root', password='cangetin'):
         self.__ssh = None
         self.server   = server
-        self.username = username
+        self.username = username        
         self.password = password
         self.PATH = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/opt/VRTS/bin:/opt/VRTSvcs/bin'
         # Get some information on your cluster
@@ -53,8 +53,8 @@ class VCS:
         if self.__ssh:
             self.__ssh.close()
 
-    def __isremote(self):
-        return self.server != 'local'
+    def isremote(self):
+        return self.server not in [ '', 'local', os.uname()[1] ]
 
     def run(self, cmd, filter='^[^\n]*', ncol=0):
         """ Execute a command on the server and returning list of results.
@@ -64,7 +64,7 @@ class VCS:
         """
         # get the output for the command
         output = ''
-        if self.__isremote():
+        if self.isremote():
             try:
                 if not self.__ssh:
                     self.__ssh = paramiko.SSHClient()

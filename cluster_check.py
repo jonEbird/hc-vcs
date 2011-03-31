@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import hcvcs, time
+import hcvcs, time, os
 
 """
 Health Check script:
@@ -74,6 +74,9 @@ std_cluser_attr = {
 def health_check(system=''):
      """ Perform a health check on the cluster.
      """
+     if not system:
+          system = os.uname()[1]
+
      print 'Checking system: %s' % (system)
      c = hcvcs.VCS(server=system)
      if not c.status:
@@ -109,20 +112,23 @@ def health_check(system=''):
           if g_state['autodisabled']:
                print '    Warn: group "%s" is currently autodisabled.' % (group)
                
-          g_list = c.group_display(group, system)
+          g_list = c.group_display(group) #, c.group_display(group, system)
 
           g_info = hcvcs.quad2dict(g_list)
           # Check values that should be set. Some attributes are different for parallel vs. failover groups.
-          if g_info['Parallel'] == '1':
+          if g_info.get('Parallel', '0') == '1':
                attr_list = parallel_group_attr
           else:
                attr_list = failover_group_attr
           for k, v in attr_list.iteritems():
-               if g_info[k] != v:
-                    print '    Warn: Expecting group %s "%s" to be "%s": Currently "%s".' % (group, k, v, g_info[k])
+               try:
+                    if g_info[k] != v:
+                         print '    Warn: Expecting group %s "%s" to be "%s": Currently "%s".' % (group, k, v, g_info[k])
+               except (KeyError), e:
+                    pass
 
           # Is the group configured to run on all systems?
-          syslist = g_info['SystemList'].split('\t')
+          syslist = g_info.get('SystemList', '').split('\t')
           group_nodes   = set([ syslist[i] for i in range(len(syslist)) if not i % 2 ])
           cluster_nodes = set(c.status.keys())
           group_nodes_off = cluster_nodes.difference(group_nodes)
