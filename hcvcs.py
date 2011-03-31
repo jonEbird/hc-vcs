@@ -7,47 +7,14 @@ try:
 except ImportError:
     raise Exception, "Please install the paramiko module. Required for connecting to remote servers."
 
-def command(cmd, filter='^[^\n]*', nparts=0):
-    """
-    Execute cmd and filter the output before the data is returned.
-    cmd should be a string with arguments (if needed) and filter is a regex
-    Return is a list of lines matched
-    """
-    try:
-        filter_re = re.compile(filter, re.M)
-        # We're combining stderr with stdout
-        proc = subprocess.Popen(cmd.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        stdout, stderr = proc.communicate()
-        if proc.returncode == 0:
-            flist = filter_re.findall(stdout)
-            if nparts:
-                # means you want the data split on each line and in at least nparts length
-                flist = [(parts + [''] * (nparts - len(parts))) for parts in [ i.split(None, nparts-1) for i in flist ]]
-            return flist
-    except (OSError), e:
-        pass
-    # Empty list means something went wrong
-    return []
-
-def remote_command(server, cmd, username='root', password='cangetin', filter='^[^\n]*'):
-
-    try:
-        filter_re = re.compile(filter, re.M)
-        ssh = paramiko.SSHClient()
-
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(server, username=username, password=password)
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        output = stdout.read()
-        ssh.close()
-        
-        return filter_re.findall(output)
-
-    except (Exception), e:
-        print 'Remote_command error: %s' % (str(e))
-        raise #pass
-    # Empty list means something went wrong
-    return []
+def quad2dict(l, pyfriendly=False):
+     """ Takes a list of quadruple values and creates a dictionary out of the key(2nd) to value(4th) items.
+     E.g. ['AppGp', 'TriggerEvent', 'global', True]  =>   {'TriggerEvent': True}
+     If you choose pyfriendly=True, it will change '1's to True and '0' to False for values.
+     """
+     if pyfriendly:
+          l = map(vcs.make_pyfriendly, l)
+     return dict([ (x[1], x[3]) for x in l ])
 
 def make_pyfriendly(x):
     """ VCS often uses '1' for True and '0' for False.
@@ -205,15 +172,11 @@ class VCS:
 
 if __name__ == '__main__':
 
-    """
-    Possible future commands to support:
-      hagrp -dep myS1oraSG  # lists dependencies between SGs
-    """
+    c = VCS()
+    if not c.status:
+        print 'Error: Problem communicating with the local cluster. Exiting.'
+        sys.exit(1)
 
-    import sys
-
-    # ./vcs.py delta "uname -a"
-    print '\n'.join(remote_command(sys.argv[1], sys.argv[2], filter=sys.argv[3]))
-    sys.exit(0)
-
-    print '\n'.join(fdisk_list())
+    from pprint import pprint
+    print 'Cluser Status:'
+    pprint(c.status)
