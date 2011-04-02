@@ -1,8 +1,14 @@
 # vcs.hc's setup.py
-from distutils.core import setup
 
-import os, sys
-long_description = open(os.path.join(os.path.dirname(sys.argv[0]), 'README.txt')).read()
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    print "If you want to use setuptools's setup(), install setuptools first."
+    from distutils.core import setup
+
+import os
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name = "hcvcs",
@@ -22,5 +28,5 @@ setup(
         "Operating System :: POSIX",
         "Topic :: System :: Clustering",
         ],
-    long_description = long_description
+    long_description = read('README')
 )
