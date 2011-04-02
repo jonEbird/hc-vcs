@@ -28,5 +28,9 @@ setup(
         "Operating System :: POSIX",
         "Topic :: System :: Clustering",
         ],
-    long_description = read('README')
+    py_modules = ['hcvcs'],
+    #packages = ['packagename'],
+    scripts = ['hc-vcs.py'],
+    install_requires = ["paramiko"],
+    long_description = read('README'),
 )
