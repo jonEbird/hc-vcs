@@ -10,15 +10,20 @@ import os
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+# Lazily updating a single file with the version information
+from hcvcs import __version__
+
 setup(
     name = "hcvcs",
-    version = "1.0.0",
+    version = __version__,
     description = "VERITAS Cluster Server Health Check",
     author = "Jon Miller",
     author_email = "jonEbird@gmail.com",
     url = "https://github.com/jonEbird/hc-vcs",
-    download_url = "http://jonebird.com/downloads/hcvcs-1.0.0.tgz",
+    download_url = "http://jonebird.com/downloads/hcvcs-%s.tar.gz" % (__version__),
     keywords = ["veritas", "VCS", "cluster"],
+    license = 'LGPL',
+    platforms = 'Posix; MacOS X',
     classifiers = [
         "Programming Language :: Python",
         "Development Status :: 4 - Beta",

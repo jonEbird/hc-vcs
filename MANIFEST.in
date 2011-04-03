@@ -1,1 +1,1 @@
-include README.txt hcvcs.py cluster_check.py
+include README hcvcs.py hc-vcs.py

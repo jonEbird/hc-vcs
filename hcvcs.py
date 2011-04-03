@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+__author__ = "Jon Miller <jonEbird@gmail.com>"
+__date__ = "3 Apr 2011"
+__version__ = "1.0.2"
+__version_info__ = (1, 0, 2)
+__license__ = "GNU Lesser General Public License (LGPL)"
+
 import subprocess, re, sys, os
 
 try:
